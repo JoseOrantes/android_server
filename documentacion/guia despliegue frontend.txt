@@ -1,0 +1,33 @@
+📋 Guía Rápida: Despliegue de Frontend en Web-Prod-01
+Paso 1: Compilar en tu máquina local
+En la terminal de tu computadora (dentro de la carpeta front_end), compila el proyecto:
+
+Bash
+npx ng build
+Paso 2: Subir los archivos al Firewall
+Desde tu máquina local, envía los archivos generados en tu carpeta browser hacia el /tmp del Firewall:
+
+Bash
+scp -r dist/front_end/browser/* usuario_firewall@IP_FIREWALL:/tmp/
+Paso 3: Pasar los archivos del Firewall a web-prod-01
+Entra a la terminal del Firewall y ejecuta este comando limpio (apuntando solo a los archivos necesarios) para mandarlos al servidor web:
+
+Bash
+scp -i ~/joseAWSopenssh.pem /tmp/favicon.ico /tmp/index.html /tmp/main-*.js /tmp/styles-*.css joseorantes@172.31.36.201:/tmp/
+Paso 4: Reemplazar y Activar en web-prod-01
+Conéctate por SSH a web-prod-01, entra a la carpeta que descubrimos que está activa y ejecuta este bloque de comandos:
+
+Bash
+# 1. Entra a la carpeta que Nginx realmente lee
+cd /var/www/html/angular-app/
+
+# 2. Borra lo viejo
+sudo rm -rf *
+
+# 3. Mueve lo nuevo desde /tmp
+sudo mv /tmp/favicon.ico /tmp/index.html /tmp/main-*.js /tmp/styles-*.css .
+
+# 4. Ajusta permisos y reinicia Nginx
+sudo chown -R www-data:www-data /var/www/html/angular-app/
+sudo chmod -R 755 /var/www/html/angular-app/
+sudo systemctl restart nginx

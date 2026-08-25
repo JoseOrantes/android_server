@@ -1,0 +1,130 @@
+HEALTH CHECKS - PRODUCCION
+
+1. Angular / Nginx
+
+Verifica que el frontend carga localmente en web-prod-01:
+
+curl http://127.0.0.1/
+
+Verifica por dominio publico:
+
+curl https://202407391.aplicacionesweb2026.com/
+
+
+2. Node login backend
+
+Valida que el backend Node este escuchando en web-prod-01:
+
+nc -zv 127.0.0.1 3000
+
+Si responde una ruta base:
+
+curl http://127.0.0.1:3000/
+
+
+3. Python inventory backend
+
+Health check simple del microservicio:
+
+curl http://127.0.0.1:5000/
+
+Debe devolver algo similar a:
+
+{"message":"Inventory service running"}
+
+Validacion funcional con datos:
+
+curl http://127.0.0.1:5000/inventory
+
+
+4. Inventory por Nginx
+
+Prueba completa de proxy + backend:
+
+curl http://127.0.0.1/api/inventory
+
+
+5. PostgreSQL tunnel
+
+Verifica que el tunel local esta arriba en web-prod-01:
+
+nc -zv 127.0.0.1 5432
+
+Consulta real al inventario por PostgreSQL:
+
+PGPASSWORD='1234' psql -h 127.0.0.1 -U postgres -d proyecto_inventory -p 5432 -c "SELECT count(*) FROM items;"
+
+
+6. MariaDB tunnel
+
+Verifica que el tunel local esta arriba en web-prod-01:
+
+nc -zv 127.0.0.1 3306
+
+Consulta real al login por MariaDB:
+
+mysql -h 127.0.0.1 -u joseorantes -p -D proyecto_login -e "SELECT count(*) FROM users;"
+
+
+7. Servicios systemd
+
+Backend login Node:
+
+systemctl status nodeapp
+
+Backend inventory Python:
+
+systemctl status inventory.service
+
+Tunel PostgreSQL para inventory:
+
+systemctl status inventory-db-tunnel.service
+
+Tunel MariaDB para login:
+
+systemctl status login-db-tunnel.service
+
+
+8. Logs rapidos
+
+Node login:
+
+journalctl -u nodeapp -n 50 --no-pager
+
+Inventory Python:
+
+journalctl -u inventory.service -n 50 --no-pager
+
+Tunel PostgreSQL:
+
+journalctl -u inventory-db-tunnel.service -n 50 --no-pager
+
+Tunel MariaDB:
+
+journalctl -u login-db-tunnel.service -n 50 --no-pager
+
+
+9. Checklist corta
+
+Ejecutar en web-prod-01:
+
+curl http://127.0.0.1/
+nc -zv 127.0.0.1 3000
+curl http://127.0.0.1:5000/
+curl http://127.0.0.1:5000/inventory
+curl http://127.0.0.1/api/inventory
+nc -zv 127.0.0.1 5432
+nc -zv 127.0.0.1 3306
+mysql -h 127.0.0.1 -u joseorantes -p -D proyecto_login -e "SELECT count(*) FROM users;"
+PGPASSWORD='1234' psql -h 127.0.0.1 -U postgres -d proyecto_inventory -p 5432 -c "SELECT count(*) FROM items;"
+
+
+10. Resultado esperado
+
+- Angular responde por Nginx.
+- Node login escucha en 127.0.0.1:3000.
+- Inventory responde en 127.0.0.1:5000.
+- /api/inventory responde por Nginx.
+- El tunel PostgreSQL escucha en 127.0.0.1:5432.
+- El tunel MariaDB escucha en 127.0.0.1:3306.
+- nodeapp, inventory.service, inventory-db-tunnel.service y login-db-tunnel.service aparecen activos.

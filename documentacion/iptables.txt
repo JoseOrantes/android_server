@@ -1,0 +1,116 @@
+db-prod-01
+joseorantes@ip-172-31-29-8:~$ sudo iptables -L -n -v --line-numbers
+[sudo] password for joseorantes:
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1     3078 5139K ACCEPT     0    --  *      *       0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+2      149 11948 ACCEPT     0    --  lo     *       0.0.0.0/0            0.0.0.0/0
+3        5   300 ACCEPT     6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22
+4        0     0 ACCEPT     6    --  *      *       172.31.36.201        0.0.0.0/0            tcp dpt:3306
+5        0     0 ACCEPT     6    --  *      *       172.31.36.201        0.0.0.0/0            tcp dpt:5432
+6        0     0 ACCEPT     6    --  *      *       172.31.36.201        0.0.0.0/0            tcp dpt:3050
+7        0     0 ACCEPT     6    --  *      *       172.31.0.0/16        0.0.0.0/0            tcp dpt:3306
+8        0     0 ACCEPT     6    --  *      *       172.31.0.0/16        0.0.0.0/0            tcp dpt:5432
+9        0     0 ACCEPT     6    --  *      *       172.31.0.0/16        0.0.0.0/0            tcp dpt:3050
+10       0     0 ACCEPT     6    --  *      *       172.31.36.201        0.0.0.0/0            tcp dpt:9100
+
+Chain FORWARD (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+
+Chain OUTPUT (policy ACCEPT 3674 packets, 402K bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+joseorantes@ip-172-31-29-8:~$ sudo iptables -S
+-P INPUT DROP
+-P FORWARD DROP
+-P OUTPUT ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -s 172.31.36.201/32 -p tcp -m tcp --dport 3306 -j ACCEPT
+-A INPUT -s 172.31.36.201/32 -p tcp -m tcp --dport 5432 -j ACCEPT
+-A INPUT -s 172.31.36.201/32 -p tcp -m tcp --dport 3050 -j ACCEPT
+-A INPUT -s 172.31.0.0/16 -p tcp -m tcp --dport 3306 -j ACCEPT
+-A INPUT -s 172.31.0.0/16 -p tcp -m tcp --dport 5432 -j ACCEPT
+-A INPUT -s 172.31.0.0/16 -p tcp -m tcp --dport 3050 -j ACCEPT
+-A INPUT -s 172.31.36.201/32 -p tcp -m tcp --dport 9100 -j ACCEPT
+joseorantes@ip-172-31-29-8:~$
+
+
+wb-prod-01
+
+
+
+joseorantes@ip-172-31-36-201:~$ sudo iptables -L -n -v --line-numbers
+[sudo] password for joseorantes:
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+
+Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+joseorantes@ip-172-31-36-201:~$ sudo iptables -S
+-P INPUT ACCEPT
+-P FORWARD ACCEPT
+-P OUTPUT ACCEPT
+joseorantes@ip-172-31-36-201:~$
+
+
+fw-prod-01
+
+joseorantes@ip-172-31-6-76:~$ sudo iptables -L -n -v --line-numbers
+Chain INPUT (policy DROP 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1    48925   30M ACCEPT     0    --  *      *       0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+2      183 16174 ACCEPT     0    --  lo     *       0.0.0.0/0            0.0.0.0/0
+3      462 27600 ACCEPT     6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:22
+4        0     0 ACCEPT     6    --  *      *       0.0.0.0/0            0.0.0.0/0            tcp dpt:5900
+5        0     0 ACCEPT     6    --  *      *       172.31.36.201        0.0.0.0/0            tcp dpt:9100
+
+Chain FORWARD (policy DROP 6 packets, 264 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1      330 35192 ACCEPT     6    --  *      *       0.0.0.0/0            172.31.36.201        tcp dpt:80
+2     2083  291K ACCEPT     6    --  *      *       0.0.0.0/0            172.31.36.201        tcp dpt:443
+3        0     0 ACCEPT     6    --  eth1   eth2    0.0.0.0/0            0.0.0.0/0            tcp dpt:3306
+4        0     0 ACCEPT     6    --  eth1   eth2    0.0.0.0/0            0.0.0.0/0            tcp dpt:5432
+5        0     0 ACCEPT     6    --  eth1   eth2    0.0.0.0/0            0.0.0.0/0            tcp dpt:3050
+6        0     0 ACCEPT     0    --  eth2   eth1    0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+7        0     0 DROP       0    --  eth2   eth0    0.0.0.0/0            0.0.0.0/0
+8        0     0 DROP       0    --  eth1   eth0    0.0.0.0/0            0.0.0.0/0
+9      245  293K ACCEPT     0    --  *      *       172.31.0.0/16        172.31.29.8          ctstate NEW,ESTABLISHED
+10       0     0 ACCEPT     0    --  *      *       172.31.29.8          172.31.0.0/16        ctstate ESTABLISHED
+11       0     0 DROP       0    --  *      *       172.31.29.8          0.0.0.0/0
+12       0     0 ACCEPT     6    --  *      *       0.0.0.0/0            172.31.36.201        tcp dpt:80
+13   17138   27M ACCEPT     0    --  *      *       0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+14      33  1716 ACCEPT     6    --  *      *       0.0.0.0/0            172.31.36.201        tcp dpt:3001
+
+Chain OUTPUT (policy ACCEPT 46698 packets, 10M bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+joseorantes@ip-172-31-6-76:~$ sudo iptables -S
+-P INPUT DROP
+-P FORWARD DROP
+-P OUTPUT ACCEPT
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 5900 -j ACCEPT
+-A INPUT -s 172.31.36.201/32 -p tcp -m tcp --dport 9100 -j ACCEPT
+-A FORWARD -d 172.31.36.201/32 -p tcp -m tcp --dport 80 -j ACCEPT
+-A FORWARD -d 172.31.36.201/32 -p tcp -m tcp --dport 443 -j ACCEPT
+-A FORWARD -i eth1 -o eth2 -p tcp -m tcp --dport 3306 -j ACCEPT
+-A FORWARD -i eth1 -o eth2 -p tcp -m tcp --dport 5432 -j ACCEPT
+-A FORWARD -i eth1 -o eth2 -p tcp -m tcp --dport 3050 -j ACCEPT
+-A FORWARD -i eth2 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -i eth2 -o eth0 -j DROP
+-A FORWARD -i eth1 -o eth0 -j DROP
+-A FORWARD -s 172.31.0.0/16 -d 172.31.29.8/32 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+-A FORWARD -s 172.31.29.8/32 -d 172.31.0.0/16 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+-A FORWARD -s 172.31.29.8/32 -j DROP
+-A FORWARD -d 172.31.36.201/32 -p tcp -m tcp --dport 80 -j ACCEPT
+-A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -d 172.31.36.201/32 -p tcp -m tcp --dport 3001 -j ACCEPT
+joseorantes@ip-172-31-6-76:~$
+
+
+

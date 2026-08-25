@@ -1,0 +1,176 @@
+BACKEND DESDE 0 ANGULAR
+
+$ git flow init
+
+$ npm init -y
+
+(powershell) volta pin node@24.13.0
+
+(deb) curl https://get.volta.sh | bash luego source ~/.bashrc luego volta pin node@24.13.0
+
+$ npm install express cors dotenv
+
+$ npm install -D typescript @types/node ts-node-dev
+
+$ npm install -D @types/express @types/cors
+
+$ npx tsc --init
+
+Agregar --> "target": "ES2020", <-- a tsconfig.json
+
+Agregar bajo "test":.... (agregar ,)
+--> "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+--> "build": "tsc",
+--> "start": "node dist/index.js"	
+
+
+package.json
+package-lock.json
+tsconfig.json
+
+Crear carpetas 
+src
+	-->Agregar
+	-config
+	-app.ts
+	-main.ts (cambiar index a main en package.json)
+	/application
+		/use-cases
+	/domain
+		/entities
+		/repositories
+		/services
+	/infrastructure
+		/repositories
+		/services
+	/interfaces
+		/controllers
+		/routes
+
+
+se corre con 
+npm run dev
+
+---------------------------------------------------
+Se continua depues de prueba existosa
+---------------------------------------------------
+//npm install pg (para postgreSQL)
+	//npm install -D @types/pg
+
+Con MSSQL (SQL)
+npm install mssql
+(JOSEUNIVERSITY\SQL2025)
+(Configurar MSSQL C:\Windows\System32\SQLServerManager17.msc)
+
+-->Crear
+	-.env (En raiz)
+
+//Crear archivo src/infrastructure/database/postgres.ts
+	//import { pool } from "pg";
+-->Crear 
+	/src
+		/infrasctructure
+			/databases
+				-mssql.ts
+					import sql from "mssql";
+
+* Se necesita coneccion a db que sea asincrona !
+// npm install sequelize pg pg-hstore si se usa pg db
+
+se corre con
+npm run dev
+
+-->Crear
+/src
+	/insfrastructure
+		/database
+			-mssql.ts (Ya deberia existir)
+			-sequelize.ts
+	/models
+		-usermodel.ts
+
+-Se necesita instalar si no se tiene
+--> npm install sequelize tedious
+CREATE LOGIN apliweb WITH PASSWORD = '1234';
+GO
+USE Apli_Web;
+CREATE USER apliweb FOR LOGIN apliweb;
+ALTER ROLE db_owner ADD MEMBER apliweb;
+
+
+Crear archivo en src/domain/services/userservice.ts
+Crear archivo en src/infrastructure/services/UserServiceImpl.ts
+Crear archivo en src/interfaces/controllers/UserController.ts
+Crear archivo en src/interfaces/routes/userRoutes.ts
+
+se corre con
+npm run dev
+
+---------------------------------------------
+CONECTANDO BACKEND / FRONTEND
+---------------------------------------------
+-> Crear 
+	/moddels
+		index.ts
+	/database
+		initDatabase.ts
+
+* Se modifica main.ts *
+
+Postman:  Se envia un nuevo usuario (no repetido)
+
+---------------------------------------------------
+Se continua depues de prueba existosa
+---------------------------------------------------
+--> Agregar
+	/service
+		UserServiceImpl.ts Agregar metodos
+		-createUser
+		=getuserbyId
+		-getUserByUsername
+		-updateUser
+		-delteUser
+
+--> Agregar metodos
+	/interfaces/controllers/UserController.ts
+		-createUser
+		=getuserbyId
+		-getUserByUsername
+		-updateUser
+		-delteUser
+
+--> Corregir rutas para agregar nuevos metodos
+	/interfaces
+		/routes
+			userRoutes.ts
+
+
+---------------------------------------------------
+trabajar ahora en FRONTEND
+---------------------------------------------------
+
+PORT=3001 npm run dev
+
+-- abre el cliente como root:
+sudo mariadb
+
+-- en el prompt de MariaDB ejecuta:
+CREATE DATABASE android_server;
+CREATE USER 'android_server'@'localhost' IDENTIFIED BY '1234';
+GRANT ALL PRIVILEGES ON android_server.* TO 'android_server'@'localhost';
+FLUSH PRIVILEGES;
+USE android_server;
+
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+  id_user INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  email VARCHAR(200) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  createdAt DATETIME NOT NULL,
+  updatedAt DATETIME NOT NULL,
+  PRIMARY KEY (id_user),
+  UNIQUE KEY users_email_unique (email)
+);
+EXIT;
+

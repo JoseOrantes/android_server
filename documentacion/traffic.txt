@@ -1,0 +1,15 @@
+Client
+  |
+  |  HTTPS/HTTP 443/80
+  v
+web-prod-01  (DMZ)  172.31.36.201
+  |
+  |-- Nginx -> Angular static site
+  |
+  |-- /api/* ----------> Node login service      127.0.0.1:3000
+  |
+  |-- /api/inventory --> Python inventory        127.0.0.1:5000
+  |
+  |-- SSH tunnel via fw-prod-01 -> MariaDB       127.0.0.1:3306 -> 172.31.29.8:3306
+  |
+  `-- SSH tunnel via fw-prod-01 -> PostgreSQL    127.0.0.1:5432 -> 172.31.29.8:5432
