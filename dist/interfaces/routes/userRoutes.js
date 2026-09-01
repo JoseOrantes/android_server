@@ -32,14 +32,28 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const controller = __importStar(require("../controllers/UserController"));
+const auth_1 = __importDefault(require("../../infrastructure/middleware/auth"));
+const profileController = __importStar(require("../controllers/ProfileController"));
 const router = (0, express_1.Router)();
+// create
 router.post('/', controller.createUser);
-router.get('/id/:id', controller.getUserById);
+// lookup by username/email should be before `/:id` to avoid routing conflicts
 router.get('/email/:email', controller.getUserByEmail);
+router.get('/username/:usuario', controller.getUserByUsername);
+// id-based routes
+router.get('/:id', controller.getUserById);
 router.put('/:id', controller.updateUser);
+router.patch('/:id/password', auth_1.default, controller.updatePassword);
 router.delete('/:id', controller.deleteUser);
+// profile routes
+router.get('/:id/profile', profileController.getProfile);
+router.post('/:id/profile', profileController.createProfile);
+router.put('/:id/profile', profileController.updateProfile);
 exports.default = router;
 //# sourceMappingURL=userRoutes.js.map

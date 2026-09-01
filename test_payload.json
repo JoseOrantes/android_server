@@ -1,0 +1,11 @@
+{
+  "nombre": "Jose",
+  "apellido": "Orantes",
+  "usuario": "jose123",
+  "password": "1234",
+  "fotoBase64": "data:image/png;base64,...",
+  "telefono": "5551234567",
+  "correo": "admin@email.com",
+  "fechaNac": "1998-04-12",
+  "genero": "M"
+}

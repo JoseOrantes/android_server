@@ -174,3 +174,5 @@ CREATE TABLE users (
 );
 EXIT;
 
+
+ssh -i joseAWSopenssh.pem ubuntu@16.59.239.35

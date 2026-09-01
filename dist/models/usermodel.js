@@ -9,6 +9,9 @@ exports.User = User;
 User.init({
     id_user: { type: sequelize_1.DataTypes.INTEGER.UNSIGNED, autoIncrement: true, primaryKey: true },
     email: { type: sequelize_1.DataTypes.STRING(200), allowNull: false, unique: true },
+    nombre: { type: sequelize_1.DataTypes.STRING(100), allowNull: true },
+    apellido: { type: sequelize_1.DataTypes.STRING(100), allowNull: true },
+    usuario: { type: sequelize_1.DataTypes.STRING(100), allowNull: true, unique: true },
     password: { type: sequelize_1.DataTypes.STRING(255), allowNull: false },
 }, { sequelize: sequelize_2.sequelize, tableName: 'users', timestamps: true });
 exports.default = User;

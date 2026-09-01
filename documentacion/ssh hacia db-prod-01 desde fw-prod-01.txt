@@ -86,3 +86,8 @@ para postgresql con python
 
 net stop postgresql-x64-16
 net start postgresql-x64-16
+
+
+
+
+ssh -i joseAWSopenssh.pem ubuntu@16.59.239.35

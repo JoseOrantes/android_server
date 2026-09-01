@@ -1,0 +1,114 @@
+Endpoints a probar:
+Health: 
+    GET http://localhost:3000/health
+
+Usuario base para las pruebas:
+    {
+        "nombre": "Jose",
+        "apellido": "Orantes",
+        "usuario": "jose123",
+        "password": "1234",
+        "fotoBase64": "data:image/png;base64,...",
+        "telefono": "5551234567",
+        "correo": "admin@email.com",
+        "fechaNac": "1998-04-12",
+        "genero": "M"
+    }
+
+Register: 
+        POST http://localhost:3000/api/register
+        Body (json):
+        {
+            "nombre": "Jose",
+            "apellido": "Orantes",
+            "usuario": "jose123",
+            "password": "1234",
+            "fotoBase64": "data:image/png;base64,...",
+            "telefono": "5551234567",
+            "correo": "admin@email.com",
+            "fechaNac": "1998-04-12",
+            "genero": "M"
+        }
+
+Login: (token)
+    POST http://localhost:3000/api/login
+        Body (json):
+        {
+            "email": "admin@email.com",
+            "password": "1234"
+        }
+
+Create user:
+        POST http://localhost:3000/api/users
+        Body (json):
+        {
+            "email": "admin@email.com",
+            "password": "1234"
+        }
+
+Get user by id: 
+    GET http://localhost:3000/api/users/:id
+
+Get by username: 
+    GET http://localhost:3000/api/users/username/:usuario
+
+Get by email:
+        GET http://localhost:3000/api/users/email/admin@email.com
+
+Update user:
+    PUT http://localhost:3000/api/users/:id
+        Body (json):
+        {
+            "nombre": "Jose",
+            "apellido": "Orantes",
+            "usuario": "jose123",
+            "password": "1234",
+            "email": "admin@email.com"
+        }
+
+Profile: 
+    GET/POST/PUT http://localhost:3000/api/users/:id/profile
+        POST/PUT Body (json):
+        {
+            "fotoBase64": "data:image/png;base64,...",
+            "telefono": "5551234567",
+            "fechaNac": "1998-04-12",
+            "genero": "M"
+        }
+
+Change password: 
+    PATCH http://localhost:3000/api/users/:id/password 
+        Requires header: Authorization: Bearer <token>
+        Body (json):
+        {
+            "currentPassword": "1234",
+            "newPassword": "12345"
+        }
+
+Delete user:
+    DELETE http://localhost:3000/api/users/:id
+
+Notes:
+- `POST /api/register` creates both user and profile in a transaction and returns:
+    {
+        "standardResponse": { "httpCode": 201, "message": "Usuario y perfil creados exitosamente" },
+        "body": { "user": { ... }, "profile": { ... } }
+    }
+- The register endpoint accepts either `correo` or `email` in the request body — the value is stored in the `users.email` column. The `profile` record does NOT store the email (no redundancy).
+- Use `:id` from the `POST /api/register` response body (`body.user.id`) when testing `GET /api/users/:id`, `PUT /api/users/:id`, profile endpoints, password change, and delete.
+- `POST /api/login` returns JWT and user in an envelope:
+    {
+        "standardResponse": { "httpCode": 200, "message": "Login exitoso" },
+        "body": { "token": "...", "user": { "id": 1, "email": "..." } }
+    }
+- Current implementation of `POST /api/login` resolves the user by `email`, so for Postman tests use `email` + `password`.
+- Current implementation of `POST /api/users` requires `email` and `password`; it does not create the profile.
+- All user GET responses exclude the `password` field.
+- `PATCH /api/users/:id/password` is the only endpoint that currently requires JWT.
+
+Production / deploy:
+- The backend now reads `HOST`, `PORT`, and `CORS_ORIGINS` from environment variables.
+- Local example: `HOST=0.0.0.0`, `PORT=3000`, `CORS_ORIGINS=http://localhost:3000,http://localhost:4200`
+- Production example: `HOST=0.0.0.0`, `PORT=3000`, `CORS_ORIGINS=http://TU_IP_PUBLICA,http://TU_DOMINIO.com,https://TU_DOMINIO.com`
+- See `.env.example` for the full variable list required by local and production environments.
+- `GET /health` can be tested from a browser. `POST /api/login` and `POST /api/register` must be tested from Postman or another HTTP client, not by opening the URL in a browser.

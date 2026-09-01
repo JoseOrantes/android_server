@@ -1,0 +1,191 @@
+ANDROID ENDPOINTS
+
+Base URL produccion:
+https://202407391.aplicacionesweb2026.com/
+
+Base URL local:
+http://10.0.2.2:3000/
+
+Notas para Android Studio:
+- En emulador Android, no uses localhost. Usa 10.0.2.2 para apuntar a tu maquina local.
+- En produccion usa HTTPS con el dominio.
+- Todos los endpoints API parten de /api excepto /health.
+- El unico endpoint protegido actualmente es PATCH /api/users/:id/password.
+- Para endpoints protegidos envia header: Authorization: Bearer <token>
+
+Usuario de prueba:
+{
+  "nombre": "Jose",
+  "apellido": "Orantes",
+  "usuario": "jose123",
+  "password": "1234",
+  "fotoBase64": "data:image/png;base64,...",
+  "telefono": "5551234567",
+  "correo": "admin@email.com",
+  "fechaNac": "1998-04-12",
+  "genero": "M"
+}
+
+1. Health
+GET /health
+
+Produccion:
+GET https://202407391.aplicacionesweb2026.com/health
+
+Respuesta esperada:
+{
+  "status": "ok"
+}
+
+2. Register
+POST /api/register
+
+Produccion:
+POST https://202407391.aplicacionesweb2026.com/api/register
+
+Headers:
+Content-Type: application/json
+
+Body:
+{
+  "nombre": "Jose",
+  "apellido": "Orantes",
+  "usuario": "jose123",
+  "password": "1234",
+  "fotoBase64": "data:image/png;base64,...",
+  "telefono": "5551234567",
+  "correo": "admin@email.com",
+  "fechaNac": "1998-04-12",
+  "genero": "M"
+}
+
+Respuesta esperada:
+{
+  "standardResponse": {
+    "httpCode": 201,
+    "message": "Usuario y perfil creados exitosamente"
+  },
+  "body": {
+    "user": {
+      "id": 1,
+      "nombre": "Jose",
+      "apellido": "Orantes",
+      "usuario": "jose123"
+    },
+    "profile": {
+      "id": 1,
+      "userId": 1,
+      "fotoBase64": "data:image/png;base64,...",
+      "telefono": "5551234567",
+      "fechaNac": "1998-04-12T00:00:00.000Z",
+      "genero": "M"
+    }
+  }
+}
+
+3. Login
+POST /api/login
+
+Produccion:
+POST https://202407391.aplicacionesweb2026.com/api/login
+
+Headers:
+Content-Type: application/json
+
+Body:
+{
+  "email": "admin@email.com",
+  "password": "1234"
+}
+
+Respuesta esperada:
+{
+  "standardResponse": {
+    "httpCode": 200,
+    "message": "Login exitoso"
+  },
+  "body": {
+    "token": "JWT_AQUI",
+    "user": {
+      "id": 1,
+      "email": "admin@email.com"
+    }
+  }
+}
+
+4. Get user by id
+GET /api/users/:id
+
+Ejemplo:
+GET https://202407391.aplicacionesweb2026.com/api/users/1
+
+5. Get user by email
+GET /api/users/email/:email
+
+Ejemplo:
+GET https://202407391.aplicacionesweb2026.com/api/users/email/admin@email.com
+
+6. Get user by username
+GET /api/users/username/:usuario
+
+Ejemplo:
+GET https://202407391.aplicacionesweb2026.com/api/users/username/jose123
+
+7. Get profile
+GET /api/users/:id/profile
+
+Ejemplo:
+GET https://202407391.aplicacionesweb2026.com/api/users/1/profile
+
+8. Update profile
+PUT /api/users/:id/profile
+
+Headers:
+Content-Type: application/json
+
+Body:
+{
+  "fotoBase64": "data:image/png;base64,...",
+  "telefono": "5551234567",
+  "fechaNac": "1998-04-12",
+  "genero": "M"
+}
+
+9. Change password
+PATCH /api/users/:id/password
+
+Headers:
+Content-Type: application/json
+Authorization: Bearer <token>
+
+Body:
+{
+  "currentPassword": "1234",
+  "newPassword": "12345"
+}
+
+10. Delete user
+DELETE /api/users/:id
+
+Flujo recomendado en Android:
+1. Probar GET /health al abrir configuracion o pantalla de debug.
+2. Registrar usuario con POST /api/register.
+3. Hacer login con POST /api/login.
+4. Guardar token JWT en SharedPreferences o DataStore.
+5. Enviar Bearer token solo para PATCH /api/users/:id/password.
+6. Guardar tambien user.id de login o register para consultar profile y user.
+
+Campos utiles para data classes:
+- LoginRequest: email, password
+- RegisterRequest: nombre, apellido, usuario, password, fotoBase64, telefono, correo, fechaNac, genero
+- StandardResponse: httpCode, message
+- LoginBody: token, user
+- LoginUser: id, email
+- RegisterUser: id, nombre, apellido, usuario
+- Profile: id, userId, fotoBase64, telefono, fechaNac, genero, createdAt, updatedAt
+
+Notas:
+- Si login devuelve invalid credentials, primero debes registrar el usuario.
+- Si register devuelve error por duplicado, limpia tablas o usa otro email/usuario.
+- Para pruebas locales en emulador Android usa http://10.0.2.2:3000/ como base URL.
+- Para produccion usa https://202407391.aplicacionesweb2026.com/
